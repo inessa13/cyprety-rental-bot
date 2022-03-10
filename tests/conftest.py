@@ -101,7 +101,7 @@ def send_service(amocker, bot_adapter_mock, db_adapter_mock):
     return services.SendService(
         bot_adapter=bot_adapter_mock,
         db_adapter=db_adapter_mock,
-        providers=[],
+        providers_=[],
     )
 
 
