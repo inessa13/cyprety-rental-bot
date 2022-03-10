@@ -1,0 +1,15 @@
+version: '3.4'
+services:
+  app:
+    build: .
+    environment:
+      TELEGRAM_BOT_TOKEN: '1963224816:AAG8dbRpTDchYvFVXuq2H4pQK17j4y-mM-4'
+      DATABASE_PATH: '/db/sqlite.db'
+      CYRB_PARSE_INTERVAL: 10
+      CYRB_LOG_LEVEL: INFO
+    #command: api
+    #stdin_open: true
+    #tty: true
+    volumes:
+    - .:/www/secretid
+    - ./db:/db

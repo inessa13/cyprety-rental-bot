@@ -1,12 +1,23 @@
 import asyncio
+import logging.config
 from typing import List
 
 import sentry_sdk
 
-from . import adapters, bots, client, config, providers, registry, services
+from . import (
+    adapters,
+    bots,
+    client,
+    config,
+    providers,
+    registry,
+    services,
+    settings,
+)
 
 
 def run():
+    logging.config.dictConfig(settings.LOGGING)
     loop = asyncio.get_event_loop()
     application = Application()
 
@@ -27,7 +38,9 @@ class Application:
         self.webclient = client.Client()
 
         self.send_service = services.SendService(
-            bot_adapter=self.bot_adapter, db_adapter=self.db_adapter, providers=self.provider_list
+            bot_adapter=self.bot_adapter,
+            db_adapter=self.db_adapter,
+            providers_=self.provider_list,
         )
 
         chat_service = services.ChatService(db_adapter=self.db_adapter)

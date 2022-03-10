@@ -1,27 +1,30 @@
 import asyncio
 import dataclasses
 import itertools
+import logging
 from typing import AsyncGenerator, List
 
-from . import datatypes, entities, protocols
-from . import providers as providers_module
+from . import datatypes, entities, protocols, providers, settings
+
+logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
 class SendService:
     bot_adapter: protocols.BotAdapter
     db_adapter: protocols.DBAdapter
-    providers: List[providers_module.Provider]
+    providers_: List[providers.Provider]
 
     async def start_sending(self) -> None:
-        async for update in self.get_updates(interval=2):
+        async for update in self.get_updates(interval=settings.PARSE_INTERVAL):
             chats = await self.db_adapter.select_chats(interested_in_price=update.price)
             text = f'[{update.title} €{update.price}]({update.telegram_link})'
             await self.bot_adapter.broadcast(chats=chats, text=text)
 
     async def get_updates(self, interval: float) -> AsyncGenerator[entities.Property, None]:
         while True:
-            futures = [provider.get_updates() for provider in self.providers]
+            logger.info('get_updates...')
+            futures = [provider.get_updates() for provider in self.providers_]
             result = await asyncio.gather(*futures)
             properties = itertools.chain.from_iterable(result)
             for real_property in properties:
